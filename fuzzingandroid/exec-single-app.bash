@@ -7,6 +7,7 @@ readonly OPEN_SOURCE=$2
 readonly DOCKERIMAGE=$3 
 readonly TIMEOUT=$4
 readonly OUTPUT_PATH=${5:-`mktemp -d`}
+readonly APK_FILE_NAME=`basename $6`   # Ting: the apk file name
 
 #readonly DOCKERIMAGE=${DOCKERIMAGE:-'droidtest/hypermonkey:1.0'}
 
@@ -18,20 +19,29 @@ fi
 
 load_dkms()
 {
-
         MODULE="vboxdrv"
         if lsmod | grep "$MODULE" &> /dev/null ; then
                  echo "$MODULE is loaded!"
         else
                 echo "Loading $MODULE from a container"
                 #insmod $(find /lib/modules/ -name $MODULE".ko")
-                docker run -d --rm --privileged=true -u root --workdir /root/fuzzingandroid "${DOCKERIMAGE}" \
-                bash -l -x -c "bash ./load_dkms.sh" 
+
+                docker run $1 -d --rm --privileged=true -u root --workdir /root/fuzzingandroid "${DOCKERIMAGE}" \
+                    bash -l -x -c "bash ./load_dkms.sh"
                 sleep 5
         fi
 }
+
+# Ting: check machine name to enable run TimeMachine on ETH/machines
+host_machine_name=`hostname`
+network_option=""
+if [[ ${host_machine_name} == "amdsuplus1" || ${host_machine_name} == "amdsuplus2" ]]
+then
+    network_option="--network=host"
+fi
+
 # load dkms in a walkaround solution
-load_dkms
+load_dkms $network_option
 
 mkdir -p "${OUTPUT_PATH}"
 
@@ -49,11 +59,11 @@ echo "Start processing $appDir"
  
 readonly OUTPUT_LOG_PATH="$OUTPUT_PATH/timemachine-run.log"
 
-time stdbuf -o0 -e0 docker run -t -a stdout -a stderr --name "${EXEC_ID}-`date +'%F-%H-%M-%S'`" \
+time stdbuf -o0 -e0 docker run ${network_option} -t -a stdout -a stderr --name "${EXEC_ID}-`date +'%F-%H-%M-%S'`" \
     --device /dev/vboxdrv:/dev/vboxdrv --privileged=true -u root \
     --workdir /root/fuzzingandroid -v "$appDir":/root/app:ro \
     -v "${OUTPUT_HYPERMONKEY_PATH}":/root/fuzzingandroid/output:rw "${DOCKERIMAGE}" \
-    bash -l -x -c "bash -x ./start.bash ~/app 1 $OPEN_SOURCE $TIMEOUT" 2>&1 \
+    bash -l -x -c "bash -x ./start.bash ~/app 1 $OPEN_SOURCE $TIMEOUT $APK_FILE_NAME" 2>&1 \
         | tee -a  "$OUTPUT_LOG_PATH"
 
 (( ${PIPESTATUS[0]} != 0 )) && (echo "Error processing $appDir !" | tee -a "$OUTPUT_LOG_PATH") && exit 1

@@ -3,7 +3,8 @@
 JACOCO_DIR=~/fuzzingandroid/jacoco_jars
 EC_DIR=~/fuzzingandroid/output/ec_files
 OUTPUT=~/fuzzingandroid/output/
-CLASS_FILES=~/fuzzingandroid/apps/tasks/app/build/intermediates/javac/amazonDebug/classes/
+#CLASS_FILES=~/fuzzingandroid/apps/tasks/app/build/intermediates/javac/amazonDebug/classes/
+CLASS_FILES=$1
 
 #~/fuzzingandroid/scripts/pull_coverage.sh coverage_temp
 

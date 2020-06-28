@@ -48,7 +48,8 @@ APP_DIR=${1}
 HEADLESS=${2}
 EMMA=${3}
 TIMEOUT=${4}
-VM=${5:-'Android7_1'}
+APK_FILE_NAME=${5}  # Ting: apk file name
+VM=${6:-'Android7_1'}
 ADB_PORT=6000
 
 if (( $# < 3 )); then
@@ -62,7 +63,8 @@ fi
 # Step 2:
 # Specifying app under test from benchmark by the folder name
 
-APP_APK=$APP_DIR/instrumented.apk  # multiple apks under folder and *.apk is used
+# APP_APK=$APP_DIR/instrumented.apk  # multiple apks under folder and *.apk is used
+APP_APK=$APP_DIR/$APK_FILE_NAME  # Ting: specify the apk
 
 # extracting the package name and the activity name
 APP_PKG=`aapt dump badging $APP_APK | grep package | awk '{print $2}' | sed s/name=//g | sed s/\'//g`
@@ -71,8 +73,9 @@ APP_ACT=`aapt dump badging $APP_APK | grep launchable-activity | awk '{print $2}
 echo "package name: $APP_PKG"
 # copy apk, .em (for coverage compuation) files to specified folders
 cp $APP_APK ~/fuzzingandroid/aut_apk/aut.apk
-cp $APP_DIR/coverage.em  ~/fuzzingandroid/emma_jars/
 
+# Ting: not use emma anymore
+# cp $APP_DIR/coverage.em  ~/fuzzingandroid/emma_jars/
 
 #stop the vm, in case it is running
 VBoxManage controlvm $VM poweroff
@@ -109,14 +112,18 @@ sleep 5
 echo "shut down VM after installing app"
 VBoxManage controlvm $VM poweroff
 
-
-
 cd FuzzerEngine/fuzzerengine
 Mode="gui"
 (( $HEADLESS == 1 )) && Mode="headless"
 OPEN_SOURCE=False
 (( $EMMA == 1 )) && OPEN_SOURCE="True"
 
-./executor.py $VM $ADB_PORT $OPEN_SOURCE "$APP_PKG" $TIMEOUT $Mode
+echo "clear history data from previous running"
+rm -rf ~/fuzzingandroid/output/ec_files/*.ec
+rm -rf ~/fuzzingandroid/output/*.xml
+rm -rf ~/fuzzingandroid/output/crashes.log
+rm -rf ~/fuzzingandroid/output/data.csv
+
+./executor.py $VM $ADB_PORT $OPEN_SOURCE "$APP_PKG" $TIMEOUT $Mode $APK_FILE_NAME
 
 

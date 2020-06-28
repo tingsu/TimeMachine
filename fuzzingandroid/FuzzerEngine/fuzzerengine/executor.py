@@ -112,15 +112,15 @@ class Executor:
         crash_t.setDaemon(True)
         crash_t.start()
     
-    def start_output(self):
+    def start_output(self, app_package_name, app_class_files_path):
         
-        output_t=threading.Thread(target=self.output)
+        output_t=threading.Thread(target=self.output, args=(app_package_name, app_class_files_path, ))
         output_t.setDaemon(True)
         output_t.start()
 
     
     
-    def run(self, app_name, recent_path_size, timeout):
+    def run(self, app_name, recent_path_size, timeout, app_class_files_path):
         
         #launching the app
         self.init_app(app_name)
@@ -129,7 +129,7 @@ class Executor:
         self.num_restore=0
         start_time=time.time()
         self.start_sys_event_generator()
-        self.start_output()
+        self.start_output(app_name, app_class_files_path)
 
         while (time.time() - start_time) < timeout:
 
@@ -138,10 +138,10 @@ class Executor:
             monkey_watcher=self.start_monkey(app_name)
             self.start_crash_watcher() 
             
-            self.start_exec(log_proc,monkey_watcher,recent_path,recent_path_size)
+            self.start_exec(log_proc,monkey_watcher,recent_path,recent_path_size, app_name, app_class_files_path)
 
-            coverage_manager.pull_coverage_files(self.num_restore)
-            coverage_manager.compute_current_coverage()
+            coverage_manager.pull_coverage_files(self.num_restore, app_name, app_class_files_path)
+            coverage_manager.compute_current_coverage(app_class_files_path)
             current_coverage = coverage_manager.read_current_coverage()
             print "--the current line coverage : " + str(current_coverage)
 
@@ -164,7 +164,7 @@ class Executor:
         self.monkey_controller.kill_monkey()
 
 
-    def start_exec(self, log_proc, monkey_watcher, recent_path, recent_path_size):
+    def start_exec(self, log_proc, monkey_watcher, recent_path, recent_path_size, app_package_name, app_class_files_path):
         
         current_coverage = coverage_manager.read_current_coverage()
         event_num=0    
@@ -177,13 +177,16 @@ class Executor:
             if log_proc.poll() != None or not monkey_watcher.isAlive():
                 print "no app info in logs ---"
                 break
-            
-            if log_watcher.poll(1):
-               line=log_proc.stdout.readline()
-            else:
-               continue
 
-        
+            try:
+                if log_watcher.poll(1):
+                   line=log_proc.stdout.readline()
+                else:
+                   continue
+            except select.error:
+                print "ting: select.error catched!"
+                pass
+
             #parsing the line, skip if the line is empty or there is no state_id
             state_info = self.parse_line(line)
             if state_info is None:
@@ -235,8 +238,8 @@ class Executor:
                     parent = self.state_graph.retrieve(self.state_id_being_fuzzed)
                     child = self.state_graph.retrieve(id)
                     
-                    coverage_manager.pull_coverage_files("temp")
-                    coverage_manager.compute_current_coverage()             # output in coverage.txt
+                    coverage_manager.pull_coverage_files("temp", app_package_name, app_class_files_path)
+                    coverage_manager.compute_current_coverage(app_class_files_path)  # output in coverage.txt
                     new_coverage = coverage_manager.read_current_coverage()
                     print "--coverage when the new state is triggered: " + str(new_coverage) + " current coverage: " + str(current_coverage)
                     
@@ -336,7 +339,7 @@ class Executor:
 
         return info
     
-    def output(self):
+    def output(self, app_package_name, app_class_files_path):
         
         with open(RunParameters.OUTPUT_FILE, "a") as csv_file:
             writer = csv.writer(csv_file, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
@@ -349,8 +352,8 @@ class Executor:
                         num_snapshots = num_snapshots+1
                 
                 #read coverage
-                coverage_manager.pull_coverage_files("temp")
-                coverage_manager.compute_current_coverage()             # output in coverage.txt
+                coverage_manager.pull_coverage_files("temp", app_package_name, app_class_files_path)
+                coverage_manager.compute_current_coverage(app_class_files_path)    # output in coverage.txt
                 current_coverage = coverage_manager.read_current_coverage()
 
                 # write files
@@ -364,7 +367,7 @@ class Executor:
 
     def dump_crash_logs(self):
         
-        cmd = "adb -s " + vm.VM.ip+ ":"+vm.VM.adb_port +"  logcat AndroidRuntime:E *:S"
+        cmd = "adb -s " + vm.VM.ip+ ":"+vm.VM.adb_port +"  logcat AndroidRuntime:E CrashAnrDetector:D System.err:W *:F *:S"
         p = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE, universal_newlines=True, close_fds=True)
         fw = open(RunParameters.CRASH_FILE, "a")
         while True:
@@ -386,6 +389,8 @@ if __name__ == '__main__':
 
     RunParameters.RUN_GUI = str(sys.argv[6])
 
+    APK_FILE_NAME = sys.argv[7]
+
     RunParameters.OUTPUT_FILE= "../../output/"  +  "data.csv"
     RunParameters.CRASH_FILE= "../../output/" +  "crashes.log"
 
@@ -405,8 +410,17 @@ if __name__ == '__main__':
 
         os.system('adb -s ' + vm.VM.ip + ':' + vm.VM.adb_port + ' shell am instrument -e coverage true -w ' + RunParameters.RUN_PKG + '/.EmmaInstrument.EmmaInstrumentation &')
         time.sleep(5)
+
+    # Ting: get the class files path
+    APP_CLASS_FILES = "/root/app/class_files.json"
+    import json
+    tmp_file = open(APP_CLASS_FILES, "r")
+    tmp_file_dict = json.load(tmp_file)
+    tmp_file.close()
+    CLASS_FILES_PATH = os.path.join('/root/app/', tmp_file_dict[APK_FILE_NAME])
+    print "CLASS_FILE_PATH: " + CLASS_FILES_PATH
    
-    executor.run(RunParameters.RUN_PKG, 10, RunParameters.RUN_TIME)
+    executor.run(RunParameters.RUN_PKG, 10, RunParameters.RUN_TIME, CLASS_FILES_PATH)
 
     graph.dump()
     machine.power_off_VM()
