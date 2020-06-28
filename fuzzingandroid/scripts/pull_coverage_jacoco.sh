@@ -4,6 +4,7 @@ COV_FILE_NAME=$1
 APP_PACKAGE_NAME=$2
 CLASS_FILES=$3
 
+OUTPUT=~/fuzzingandroid/output/
 EC_DIR=~/fuzzingandroid/output/ec_files
 JACOCO_DIR=~/fuzzingandroid/jacoco_jars
 # Note: jacoco does not know the "~" symbol in file path, so just use the absolute path
@@ -40,5 +41,7 @@ then
 else
     echo "SUCCESS: coverage file is valid!"
     mkdir -p "${EC_DIR}"
+    var=`date +"%T"`
+    cp coverage.ec $OUTPUT/coverage_$var.ec
     mv coverage.ec $EC_DIR/$COV_FILE_NAME.ec
 fi
