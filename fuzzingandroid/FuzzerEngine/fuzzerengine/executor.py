@@ -140,7 +140,9 @@ class Executor:
             
             self.start_exec(log_proc,monkey_watcher,recent_path,recent_path_size, app_name, app_class_files_path)
 
-            coverage_manager.pull_coverage_files(self.num_restore, app_name, app_class_files_path)
+            coverage_manager.pull_coverage_files(self.num_restore, app_name, app_class_files_path,
+                                                 vm.VM.ip + ':' + vm.VM.adb_port)
+
             coverage_manager.compute_current_coverage(app_class_files_path)
             current_coverage = coverage_manager.read_current_coverage()
             print "--the current line coverage : " + str(current_coverage)
@@ -238,7 +240,9 @@ class Executor:
                     parent = self.state_graph.retrieve(self.state_id_being_fuzzed)
                     child = self.state_graph.retrieve(id)
                     
-                    coverage_manager.pull_coverage_files("temp", app_package_name, app_class_files_path)
+                    coverage_manager.pull_coverage_files("temp", app_package_name, app_class_files_path,
+                                                         vm.VM.ip + ':' + vm.VM.adb_port)
+
                     coverage_manager.compute_current_coverage(app_class_files_path)  # output in coverage.txt
                     new_coverage = coverage_manager.read_current_coverage()
                     print "--coverage when the new state is triggered: " + str(new_coverage) + " current coverage: " + str(current_coverage)
@@ -352,7 +356,9 @@ class Executor:
                         num_snapshots = num_snapshots+1
                 
                 #read coverage
-                coverage_manager.pull_coverage_files("temp", app_package_name, app_class_files_path)
+                coverage_manager.pull_coverage_files("temp", app_package_name, app_class_files_path,
+                                                     vm.VM.ip + ':' + vm.VM.adb_port)
+
                 coverage_manager.compute_current_coverage(app_class_files_path)    # output in coverage.txt
                 current_coverage = coverage_manager.read_current_coverage()
 
