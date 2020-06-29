@@ -17,11 +17,11 @@ def get_emma_coverage(restore_count):
     output, err = cmd.communicate()
     print 'get_emma_coverage- return code: ' + ' output: ' + str(output) + ' ' + str(err) +' '
 
-def get_jacoco_coverage(restore_count, app_package_name, app_class_files_path):
+def get_jacoco_coverage(restore_count, app_package_name, app_class_files_path, avd_serial):
     # adb shell am broadcast -a edu.gatech.m3.emma.COLLECT_COVERAGE
     cov_file_name = 'coverage' + str(restore_count)
 
-    cmd = subprocess.Popen(['../../scripts/pull_coverage_jacoco.sh', cov_file_name, app_package_name, app_class_files_path],
+    cmd = subprocess.Popen(['../../scripts/pull_coverage_jacoco.sh', cov_file_name, app_package_name, app_class_files_path, avd_serial],
                            stdout = subprocess.PIPE, stderr = subprocess.PIPE)
     output, err = cmd.communicate()
     print 'get_jacoco_coverage- return code: ' + ' output: ' + str(output) + ' ' + str(err) +' '
@@ -125,10 +125,10 @@ def compute_current_coverage(app_class_files_path):
     else:
         compute_coverage_ella()
 
-def pull_coverage_files(restore_count, app_package_name, app_class_files_path):
+def pull_coverage_files(restore_count, app_package_name, app_class_files_path, avd_serial):
     if RunParameters.OPEN_SOURCE:
         # get_emma_coverage(restore_count)
-        get_jacoco_coverage(restore_count, app_package_name, app_class_files_path)
+        get_jacoco_coverage(restore_count, app_package_name, app_class_files_path, avd_serial)
     else:
         get_ella_coverage(restore_count)
 
@@ -145,6 +145,7 @@ def record_coverage():
 
             # compute_coverage()
             # coverage = read_coverage()
+            # TODO, record_coverage() is not used in the project, so it is okay for now without giving proper parameters.
             compute_coverage_jacoco()
             coverage = read_coverage_jacoco()
 

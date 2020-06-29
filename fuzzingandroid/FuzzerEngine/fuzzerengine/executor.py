@@ -280,7 +280,7 @@ class Executor:
     def bring_app_to_front(self,pkg_name):
 
         try:
-            cmd="adb -s " + vm.VM.ip+ ":"+vm.VM.adb_port +" shell dumpsys activity recents | grep realActivity="+ pkg_name + "  | cut -d'=' -f2 | xargs adb shell am start "
+            cmd="adb -s " + vm.VM.ip+ ":"+vm.VM.adb_port +" shell dumpsys activity recents | grep realActivity="+ pkg_name + "  | cut -d'=' -f2 | xargs adb -s " + vm.VM.ip+ ":"+vm.VM.adb_port + " shell am start "
             os.system(cmd + " > /dev/null 2>&1")
         except Exception, e:
             print "resumed app failed."
@@ -289,7 +289,7 @@ class Executor:
     def init_app(self, app_name):
 
         print "launching app under test..."
-        os.system("adb shell monkey -p " + app_name + "  1") 
+        os.system("adb -s " + vm.VM.ip + ':' + vm.VM.adb_port + " shell monkey -p " + app_name + "  1")
         print "takes a while to complete starting animation ..."
         time.sleep(5)
 
