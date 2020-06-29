@@ -23,5 +23,5 @@ done
 echo $EC_FILES
 
 var=`date +"%T"`
-java -jar $JACOCO_DIR/jacococli.jar report $EC_FILES --classfiles $CLASS_FILES --xml $OUTPUT/coverage.xml
+java -jar $JACOCO_DIR/jacococli.jar report $EC_FILES $CLASS_FILES --xml $OUTPUT/coverage.xml
 cp $OUTPUT/coverage.xml $OUTPUT/coverage_$var.xml

@@ -20,13 +20,13 @@ echo "---"
 adb -s $AVD_SERIAL shell 'su -c '\""mv /data/data/${APP_PACKAGE_NAME}/files/coverage.ec /sdcard/\""''
 adb -s $AVD_SERIAL pull /sdcard/coverage.ec
 
-cmd="java -jar $JACOCO_DIR/jacococli.jar report coverage.ec --classfiles $CLASS_FILES &> temp"
+cmd="java -jar $JACOCO_DIR/jacococli.jar report coverage.ec $CLASS_FILES &> temp"
 echo "---"
 echo "[VALIDATE COVERAGE FILE]$ $cmd"
 echo "---"
 
 # java -jar ~/Projs/app-coverage-analysis/DroidMutator/droidbot/resources/jacococli.jar report coverage.ec --classfiles ./app/build/intermediates/javac/amazonDebug/classes/ --xml tasks.coverage.xml
-java -jar $JACOCO_DIR/jacococli.jar report coverage.ec --classfiles $CLASS_FILES &> temp
+java -jar $JACOCO_DIR/jacococli.jar report coverage.ec $CLASS_FILES &> temp
 
 echo "---"
 echo "[VALIDATE MESSAGE]"

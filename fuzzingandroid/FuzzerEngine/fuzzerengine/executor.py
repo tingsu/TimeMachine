@@ -423,7 +423,11 @@ if __name__ == '__main__':
     tmp_file = open(APP_CLASS_FILES, "r")
     tmp_file_dict = json.load(tmp_file)
     tmp_file.close()
-    CLASS_FILES_PATH = os.path.join('/root/app/', tmp_file_dict[APK_FILE_NAME])
+    app_path_info_dict = tmp_file_dict[APK_FILE_NAME]
+    class_files_path_list = app_path_info_dict['classfiles']
+    CLASS_FILES_PATH = ""
+    for class_files_path in class_files_path_list:
+        CLASS_FILES_PATH += ' --classfiles ' + os.path.join('/root/app/', class_files_path)
     print "CLASS_FILE_PATH: " + CLASS_FILES_PATH
    
     executor.run(RunParameters.RUN_PKG, 10, RunParameters.RUN_TIME, CLASS_FILES_PATH)
