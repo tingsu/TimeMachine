@@ -49,8 +49,12 @@ HEADLESS=${2}
 EMMA=${3}
 TIMEOUT=${4}
 APK_FILE_NAME=${5}  # Ting: apk file name
-VM=${6:-'Android7_1'}
-ADB_PORT=6000
+ADB_PORT=${6}  # by default, 6000
+VM=${7:-'Android7_1'}
+
+echo "----"
+echo "ADB_PORT: ${ADB_PORT}"
+echo "----"
 
 if (( $# < 3 )); then
     echo 'Wrong usage!'
@@ -120,10 +124,10 @@ OPEN_SOURCE=False
 
 echo "clear history data from previous running"
 rm -rf ~/fuzzingandroid/output/ec_files/*.ec
+rm -rf ~/fuzzingandroid/output/*.ec
 rm -rf ~/fuzzingandroid/output/*.xml
 rm -rf ~/fuzzingandroid/output/crashes.log
 rm -rf ~/fuzzingandroid/output/data.csv
 
 ./executor.py $VM $ADB_PORT $OPEN_SOURCE "$APP_PKG" $TIMEOUT $Mode $APK_FILE_NAME
-
 
