@@ -429,7 +429,7 @@ if __name__ == '__main__':
     if RunParameters.OPEN_SOURCE:
 
         #os.system('adb -s ' + vm.VM.ip + ':' + vm.VM.adb_port + ' shell am instrument -e coverage true -w ' + RunParameters.RUN_PKG + '/.EmmaInstrument.EmmaInstrumentation &')
-        #time.sleep(5)
+        time.sleep(5)
 
     # Ting: get the class files path
     APP_CLASS_FILES = "/root/app/class_files.json"

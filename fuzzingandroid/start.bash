@@ -18,7 +18,7 @@ function wait_adb {
         adb disconnect $DEVICE > /dev/null 2>&1
         adb connect $DEVICE > /dev/null 2>&1
 
-        ! timeout 2 adb -s $DEVICE wait-for-device shell exit 0 > /dev/null 2>&1 || break
+        ! timeout 10 adb -s $DEVICE wait-for-device shell exit 0 > /dev/null 2>&1 || break
     done 
     
     adb -s $DEVICE wait-for-device
@@ -26,14 +26,49 @@ function wait_adb {
 
 replace_monkey_uiautomator()
 {
-        adb -s $DEVICE push libs/monkey /sdcard
-        adb -s $DEVICE push libs/*.jar /sdcard
+	sleep 5
+	while true; do
+		adb -s $DEVICE push libs/monkey /sdcard/
+		if [[ $? != 0 ]]
+		then
+			sleep 2
+		else
+			break
+		fi
+	done
+
+	sleep 2
+	while true; do
+	        adb -s $DEVICE push libs/monkey.jar /sdcard/
+		if [[ $? != 0 ]]
+                then
+                        sleep 2
+                else
+                        break
+                fi
+	done
+
+	sleep 2
+	while true; do
+		adb -s $DEVICE push libs/uiautomator.jar /sdcard/
+		if [[ $? != 0 ]]
+                then
+                        sleep 2
+                else
+                        break
+                fi
+	done
         sleep 2
         adb -s $DEVICE shell 'su -c "mv /sdcard/monkey /system/bin/"'
+	sleep 1
         adb -s $DEVICE shell 'su -c "mv /sdcard/monkey.jar /system/framework/"'
+	sleep 1
         adb -s $DEVICE shell 'su -c "mv /sdcard/uiautomator.jar /system/framework/"'
+	sleep 1
         adb -s $DEVICE shell 'su -c "chmod 777 /system/framework/monkey.jar"'
+	sleep 1
         adb -s $DEVICE shell 'su -c "chmod 777 /system/framework/uiautomator.jar"'
+	sleep 1
         adb -s $DEVICE shell 'su -c "chmod 777 /system/bin/monkey"'
 }
 
@@ -103,8 +138,8 @@ sleep 10
 replace_monkey_uiautomator
 
 # uninstall the app if installed, then install
-echo "uninstall app in case it is installed before"
-adb -s $DEVICE uninstall $APP_PKG
+#echo "uninstall app in case it is installed before"
+#adb -s $DEVICE uninstall $APP_PKG
 
 echo "install app under test"
 # Give the app all the permissions when installing
