@@ -295,7 +295,19 @@ class Executor:
         print "launching app under test..."
         cmd="adb -s " + vm.VM.ip + ':' + vm.VM.adb_port + " shell monkey -p " + app_name + "  1"
         print cmd
-        os.system("adb -s " + vm.VM.ip + ':' + vm.VM.adb_port + " shell monkey -p " + app_name + "  1")
+        while True:
+            p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            output = str(p.stdout.read()).strip()
+            if "No activities found to run" in output:
+                print "ERROR: launch failed! Try Again!"
+                time.sleep(5)
+            elif "Events injected" in output:
+                print "SUCCESS: app is launched!"
+                break
+            else:
+                print "New Message"
+                break
+            #os.system("adb -s " + vm.VM.ip + ':' + vm.VM.adb_port + " shell monkey -p " + app_name + "  1")
         print "takes a while to complete starting animation ..."
         time.sleep(5)
 
