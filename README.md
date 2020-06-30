@@ -1,4 +1,4 @@
-# TimeMachine #
+# TimeMachine <img align="right" src="https://zenodo.org/badge/DOI/10.5281/zenodo.3672076.svg">
 
 TimeMachine is an automated testing tool for Android apps,  which can automatically jump to the most progressive state observed in the past when progress is slow. 
 
@@ -16,6 +16,7 @@ The figure above demonstrates how it works. When execution keeps going through a
 --->
 
 ## Publication ##
+The paper PDF can be found at https://www.comp.nus.edu.sg/~abhik/pdf/ICSE20TM.pdf
 ```
 @InProceedings{zhendong:icse:2020,
 author = {Dong, Zhen and B{\"o}hme, Marcel and Cojocaru, Lucia and Roychoudhury, Abhik},
@@ -40,11 +41,14 @@ The figure above shows TimeMachine's architecture. The whole system runs in a do
 * Docker API v1.13 or above 
 * Python 2.7.2
 
+## Todo ##
+Ubuntu version needs to be specified in the current setting, Ubuntu 18.04 for now. <br>
+Develop a module to dynamically identify versions of the operation system for image building.
 ## Setup ##
 The following is required to set up TimeMachine:
 * at least 100 GB hard drive 
 * 8 GB memory
-* Ububntu 16.04 64-bit
+* Ububntu 18.04 64-bit
 
 ### Step 1: clone repository ###
 ```
@@ -65,6 +69,7 @@ newgrp docker
 docker build -t droidtest/timemachine:1.0 .
 ```
 It takes serveral minutes.
+**Note:** you should build the docker image whenever your running Linux kernel has been changed(e.g. kernel updated).
 ## Usage ##
 TimeMachine takes as input apks instrumented with Android apps instrumenting tool [Emma](http://emma.sourceforge.net/) or [Ella](https://github.com/saswatanand/ella). Under folder two_apps_under_test are closed-source apks instrumented with Ella, i.e., Microsoft Word and Duolingo.  
 ```
