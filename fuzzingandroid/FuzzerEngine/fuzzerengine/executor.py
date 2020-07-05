@@ -387,7 +387,7 @@ class Executor:
 
     def dump_crash_logs(self):
         
-        cmd = "adb -s " + vm.VM.ip+ ":"+vm.VM.adb_port +"  logcat AndroidRuntime:E CrashAnrDetector:D System.err:W *:F *:S"
+        cmd = "adb -s " + vm.VM.ip+ ":"+vm.VM.adb_port +"  logcat AndroidRuntime:E CrashAnrDetector:D System.err:W CustomActivityOnCrash:E *:F *:S"
         p = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE, universal_newlines=True, close_fds=True)
         fw = open(RunParameters.CRASH_FILE, "a")
         while True:
@@ -429,7 +429,7 @@ if __name__ == '__main__':
     if RunParameters.OPEN_SOURCE:
 
         #os.system('adb -s ' + vm.VM.ip + ':' + vm.VM.adb_port + ' shell am instrument -e coverage true -w ' + RunParameters.RUN_PKG + '/.EmmaInstrument.EmmaInstrumentation &')
-        #time.sleep(5)
+        time.sleep(5)
 
     # Ting: get the class files path
     APP_CLASS_FILES = "/root/app/class_files.json"
