@@ -111,14 +111,14 @@ class VM:
     
         while True:
             self.connect_adb()
-            if 0 == subprocess.call('timeout 2 adb -s '+ VM.ip+':'+VM.adb_port+'  wait-for-device shell exit', shell=True):
+            if 0 == subprocess.call('timeout 5 adb -s '+ VM.ip+':'+VM.adb_port+'  wait-for-device shell exit', shell=True):
                 break
             self.disconnect_adb()
 
         print('adb is connected!')
 
     def adb_wait_device(self):
-        subprocess.check_call('timeout 2 adb -s '+ VM.ip+':'+VM.adb_port+'  wait-for-device', shell=True)
+        subprocess.check_call('timeout 5 adb -s '+ VM.ip+':'+VM.adb_port+'  wait-for-device', shell=True)
 
        
         
