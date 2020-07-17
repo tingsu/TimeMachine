@@ -387,7 +387,7 @@ class Executor:
 
     def dump_crash_logs(self):
         
-        cmd = "adb -s " + vm.VM.ip+ ":"+vm.VM.adb_port +"  logcat AndroidRuntime:E CrashAnrDetector:D System.err:W CustomActivityOnCrash:E ACRA:E *:F *:S"
+        cmd = "adb -s " + vm.VM.ip+ ":"+vm.VM.adb_port +"  logcat AndroidRuntime:E CrashAnrDetector:D System.err:W CustomActivityOnCrash:E ACRA:E WordPress-EDITOR:E *:F *:S"
         p = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE, universal_newlines=True, close_fds=True)
         fw = open(RunParameters.CRASH_FILE, "a")
         while True:
