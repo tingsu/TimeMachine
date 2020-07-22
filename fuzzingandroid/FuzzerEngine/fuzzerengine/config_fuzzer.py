@@ -13,6 +13,7 @@ class RunParameters:
 
     OUTPUT_FILE = "pareto0.log"
     CRASH_FILE = "pareto0.crash"
+    RUN_TIME_FILE = "run_time.log"
     OPEN_SOURCE = True
 
 

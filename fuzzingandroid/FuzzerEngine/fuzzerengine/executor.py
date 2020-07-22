@@ -16,7 +16,7 @@ from collections import deque
 from adb_messages_queue import AdbMessagesQueue
 from sysevent_generator import SysEventGenerator
 from circular_restore_strategy import CircularRestoreStrategy
-
+from datetime import datetime
 import coverage_manager
 
 import csv
@@ -397,6 +397,10 @@ class Executor:
             if p.poll() != None:
                 print "crash watcher is termined..."
                 break
+
+        now = datetime.now()
+        current_time = now.strftime("%Y-%m-%d-%H:%M:%S")
+        fw.write("[" + current_time + "]" + "\n")
         fw.close()
 
 
@@ -413,7 +417,7 @@ if __name__ == '__main__':
 
     RunParameters.OUTPUT_FILE= "../../output/"  +  "data.csv"
     RunParameters.CRASH_FILE= "../../output/" +  "crashes.log"
-
+    RunParameters.RUN_TIME_FILE = "../../output/" +  "run_time.log"
 
     machine = vm.VM(RunParameters.RUN_GUI, vm.VM.adb_port)  # headless or gui
 
@@ -443,8 +447,20 @@ if __name__ == '__main__':
     for class_files_path in class_files_path_list:
         CLASS_FILES_PATH += ' --classfiles ' + os.path.join('/root/app/', class_files_path)
     print "CLASS_FILE_PATH: " + CLASS_FILES_PATH
+
+    fw = open(RunParameters.RUN_TIME_FILE, "a")
+    now = datetime.now()
+    current_time = now.strftime("%Y-%m-%d-%H:%M:%S")
+    fw.write(current_time)
+    fw.close()
    
     executor.run(RunParameters.RUN_PKG, 10, RunParameters.RUN_TIME, CLASS_FILES_PATH)
+
+    fw = open(RunParameters.RUN_TIME_FILE, "a")
+    now = datetime.now()
+    current_time = now.strftime("%Y-%m-%d-%H:%M:%S")
+    fw.write(current_time + "\n")
+    fw.close()
 
     graph.dump()
     machine.power_off_VM()
