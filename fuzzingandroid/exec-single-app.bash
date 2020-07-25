@@ -9,6 +9,7 @@ readonly TIMEOUT=$4
 readonly OUTPUT_PATH=${5:-`mktemp -d`}
 readonly APK_FILE_NAME=`basename $6`   # Ting: the apk file name
 readonly ADB_PORT=$7
+readonly LOGIN_SCRIPT=$8
 
 echo "----"
 echo "ADB_PORT: ${ADB_PORT}"
@@ -68,7 +69,7 @@ time stdbuf -o0 -e0 docker run ${network_option} -t -a stdout -a stderr --name "
     --device /dev/vboxdrv:/dev/vboxdrv --privileged=true -u root \
     --workdir /root/fuzzingandroid -v "$appDir":/root/app:ro \
     -v "${OUTPUT_HYPERMONKEY_PATH}":/root/fuzzingandroid/output:rw "${DOCKERIMAGE}" \
-    bash -l -x -c "bash -x ./start.bash ~/app 1 $OPEN_SOURCE $TIMEOUT $APK_FILE_NAME $ADB_PORT" 2>&1 \
+    bash -l -x -c "bash -x ./start.bash ~/app 1 $OPEN_SOURCE $TIMEOUT $APK_FILE_NAME $ADB_PORT $LOGIN_SCRIPT" 2>&1 \
         | tee -a  "$OUTPUT_LOG_PATH"
 
 (( ${PIPESTATUS[0]} != 0 )) && (echo "Error processing $appDir !" | tee -a "$OUTPUT_LOG_PATH") && exit 1

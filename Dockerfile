@@ -7,8 +7,10 @@ MAINTAINER zhendong@gmail.com
 WORKDIR /root
 ENV DEBIAN_FRONTEND noninteractive
 
-RUN  apt-get update && apt-get install -y linux-headers-$(uname -r) virtualbox-dkms virtualbox virtualbox-qt  python-pip openjdk-8-jdk git-core \
-     && pip install pyvbox enum vbox-sdk uiautomator  
+RUN  apt-get update && apt-get install -y linux-headers-$(uname -r) virtualbox-dkms virtualbox virtualbox-qt  python-pip python3-pip openjdk-8-jdk git-core \
+     && pip install pyvbox enum vbox-sdk uiautomator \
+     # uiautomator2's recent versions (v.2.10.1 - v2.9.6) failed; 2.4.3 at least works. The main issue is related to the version of atx-agent
+     && pip3 install -U uiautomator2==2.4.3	 
 
 
 #super important: setting enviroment variables

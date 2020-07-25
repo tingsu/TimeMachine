@@ -85,7 +85,8 @@ EMMA=${3}
 TIMEOUT=${4}
 APK_FILE_NAME=${5}  # Ting: apk file name
 ADB_PORT=${6}  # by default, 6000
-VM=${7:-'Android7_1'}
+LOGIN_SCRIPT=${7}
+VM=${8:-'Android7_1'}
 
 echo "----"
 echo "ADB_PORT: ${ADB_PORT}"
@@ -164,5 +165,5 @@ rm -rf ~/fuzzingandroid/output/*.xml
 rm -rf ~/fuzzingandroid/output/crashes.log
 rm -rf ~/fuzzingandroid/output/data.csv
 
-./executor.py $VM $ADB_PORT $OPEN_SOURCE "$APP_PKG" $TIMEOUT $Mode $APK_FILE_NAME
+./executor.py $VM $ADB_PORT $OPEN_SOURCE "$APP_PKG" $TIMEOUT $Mode $APK_FILE_NAME $LOGIN_SCRIPT
 

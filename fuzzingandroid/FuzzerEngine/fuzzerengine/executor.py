@@ -17,6 +17,7 @@ from adb_messages_queue import AdbMessagesQueue
 from sysevent_generator import SysEventGenerator
 from circular_restore_strategy import CircularRestoreStrategy
 from datetime import datetime
+from subprocess import call
 import coverage_manager
 
 import csv
@@ -120,10 +121,10 @@ class Executor:
 
     
     
-    def run(self, app_name, recent_path_size, timeout, app_class_files_path):
+    def run(self, app_name, recent_path_size, timeout, app_class_files_path, login_script):
         
         #launching the app
-        self.init_app(app_name)
+        self.init_app(app_name, login_script)
         
         recent_path = deque(maxlen=recent_path_size)
         self.num_restore=0
@@ -290,7 +291,7 @@ class Executor:
             print "resumed app failed."
 
 
-    def init_app(self, app_name):
+    def init_app(self, app_name, login_script):
 
         print "launching app under test..."
         cmd="adb -s " + vm.VM.ip + ':' + vm.VM.adb_port + " shell monkey -p " + app_name + "  1"
@@ -313,6 +314,17 @@ class Executor:
 
         self.bring_app_to_front(self.pkg_name)
         time.sleep(5)
+
+
+        # Ting: add login code
+        if login_script != "":
+            print "Start to login:"
+            login_cmd = "python3 " + login_script + " " + vm.VM.ip + ':' + vm.VM.adb_port
+            print "--------"
+            print login_cmd
+            print "--------"
+            call(login_cmd, shell=True)
+
         print "--taking snapshot for the initial state..."
         self.state_graph.add_node("INITIAL")
         self.vm.take_snapshot("INITIAL", "", True)
@@ -414,6 +426,7 @@ if __name__ == '__main__':
     RunParameters.RUN_GUI = str(sys.argv[6])
 
     APK_FILE_NAME = sys.argv[7]
+    LOGIN_SCRIPT = sys.argv[8]
 
     RunParameters.OUTPUT_FILE= "../../output/"  +  "data.csv"
     RunParameters.CRASH_FILE= "../../output/" +  "crashes.log"
@@ -448,14 +461,21 @@ if __name__ == '__main__':
         CLASS_FILES_PATH += ' --classfiles ' + os.path.join('/root/app/', class_files_path)
     print "CLASS_FILE_PATH: " + CLASS_FILES_PATH
 
+    # record testing starting time
     fw = open(RunParameters.RUN_TIME_FILE, "a")
     now = datetime.now()
     current_time = now.strftime("%Y-%m-%d-%H:%M:%S")
     fw.write(current_time)
     fw.close()
-   
-    executor.run(RunParameters.RUN_PKG, 10, RunParameters.RUN_TIME, CLASS_FILES_PATH)
 
+    if LOGIN_SCRIPT != "":
+        # the app requires login script
+        script_file_name = os.path.basename(LOGIN_SCRIPT)
+        LOGIN_SCRIPT = os.path.join("/root/app/", script_file_name)
+   
+    executor.run(RunParameters.RUN_PKG, 10, RunParameters.RUN_TIME, CLASS_FILES_PATH, LOGIN_SCRIPT)
+
+    # record testing ending time
     fw = open(RunParameters.RUN_TIME_FILE, "a")
     now = datetime.now()
     current_time = now.strftime("%Y-%m-%d-%H:%M:%S")
