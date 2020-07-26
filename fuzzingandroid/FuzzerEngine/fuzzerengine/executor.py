@@ -426,7 +426,10 @@ if __name__ == '__main__':
     RunParameters.RUN_GUI = str(sys.argv[6])
 
     APK_FILE_NAME = sys.argv[7]
-    LOGIN_SCRIPT = sys.argv[8]
+    if len(sys.argv) >=9:
+        LOGIN_SCRIPT = sys.argv[8]
+    else:
+        LOGIN_SCRIPT = ""
 
     RunParameters.OUTPUT_FILE= "../../output/"  +  "data.csv"
     RunParameters.CRASH_FILE= "../../output/" +  "crashes.log"
