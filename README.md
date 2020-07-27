@@ -105,3 +105,53 @@ cat duolingo_output/timemachine-output/crashes.log
 * Abhik Roychoudhury
 
 
+# Some useful commands to debug TimeMachine
+
+1. view the GUI
+
+Set up the $HOME/.Xauthority (on my desktop, Ubuntu-18.04), see this [link](https://askubuntu.com/questions/21923/how-do-i-create-the-xauthority-file)
+```
+ln -s -f $Xauthority $HOME/.Xauthority
+``` 
+
+2. start the docker with GUI forwarding enabled
+```
+docker run -it --privileged -e DISPLAY=$DISPLAY --net=host -v $HOME/.Xauthority:/root/.Xauthority:rw -v /dev:/dev droidtest/timemachine:1.0
+
+```
+
+3. create, start, and power off the Android VM inside the docker
+```
+./setup_vm.bash Android7_1 5554
+
+VBoxManage startvm Android7_1 
+
+VBoxManage controlvm Android7_1 poweroff
+
+rm -rf /root/VirtualBox\ VMs/Android7_1/
+```
+
+I tried to resize the VM screen size. But it does not take effect. See this [link](https://superuser.com/questions/31669/change-resolution-from-command-line-in-virtual-box)
+```
+VBoxManage controlvm "Android7_1" setvideomodehint 1024 600 32
+```
+
+Show without GUI: 
+```
+VBoxManage startvm Android7_1 --type headless
+```
+
+4. connect to the Android VM
+```
+adb disconnect 127.0.0.1:5554
+
+adb connect 127.0.0.1:5554
+```
+
+5. Test uiautomator2 against Android VM (uiautomator2 v2.4.3 works)
+
+```
+pip3 install -U uiautomator2==2.4.3
+
+python3 -m uiautomator2 init
+```
