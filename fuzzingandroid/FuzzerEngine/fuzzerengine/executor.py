@@ -319,7 +319,7 @@ class Executor:
         # Ting: add login code
         if login_script != "":
             print "Start to login:"
-            login_cmd = "python3 " + login_script + " " + vm.VM.ip + ':' + vm.VM.adb_port
+            login_cmd = "python3 " + login_script + " " + vm.VM.ip + ':' + vm.VM.adb_port + " timemachine"
             print "--------"
             print login_cmd
             print "--------"

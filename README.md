@@ -115,9 +115,9 @@ ln -s -f $Xauthority $HOME/.Xauthority
 ``` 
 
 2. start the docker with GUI forwarding enabled
+
 ```
 docker run -it --privileged -e DISPLAY=$DISPLAY --net=host -v $HOME/.Xauthority:/root/.Xauthority:rw -v /dev:/dev droidtest/timemachine:1.0
-
 ```
 
 3. create, start, and power off the Android VM inside the docker
