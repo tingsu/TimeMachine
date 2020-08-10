@@ -70,6 +70,40 @@ replace_monkey_uiautomator()
         adb -s $DEVICE shell 'su -c "chmod 777 /system/framework/uiautomator.jar"'
 	sleep 1
         adb -s $DEVICE shell 'su -c "chmod 777 /system/bin/monkey"'
+
+	# copy pictures
+	sleep 1
+	adb -s $DEVICE push libs/dummy_documents/Android_logo.jpg /sdcard/Pictures/
+	sleep 1
+	adb -s $DEVICE push libs/dummy_documents/Android_robot.png /sdcard/Pictures/
+	sleep 1
+	adb -s $DEVICE push libs/dummy_documents/droidbot_utg.png /sdcard/Pictures/
+
+	# copy musics
+	sleep 1
+	adb -s $DEVICE push libs/dummy_documents/Heartbeat.mp3 /sdcard/Music/
+	sleep 1
+	adb -s $DEVICE push libs/dummy_documents/intermission.mp3 /sdcard/Music/
+
+	# copy movies
+	sleep 1
+	adb -s $DEVICE push libs/dummy_documents/sample_iPod.m4v /sdcard/Movies/
+	sleep 1
+	adb -s $DEVICE push libs/dummy_documents/sample_mpeg4.mp4 /sdcard/Movies/
+	sleep 1
+	adb -s $DEVICE push libs/dummy_documents/sample_sorenson.mov /sdcard/Movies/
+	sleep 1
+	adb -s $DEVICE push libs/dummy_documents/sample.3gp /sdcard/Movies/
+
+	# copy docs
+	sleep 1
+	adb -s $DEVICE push libs/dummy_documents/DroidBot_documentation.docx /sdcard/Download/
+	sleep 1
+	adb -s $DEVICE push libs/dummy_documents/DroidBot_documentation.pdf /sdcard/Download/
+	sleep 1
+	adb -s $DEVICE push libs/dummy_documents/password.txt /sdcard/Download/
+	sleep 1
+	adb -s $DEVICE push libs/dummy_documents/sample_3GPP.3gp.zip /sdcard/Download/
 }
 
 
